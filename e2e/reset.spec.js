@@ -1,23 +1,23 @@
 import { test, expect } from '@playwright/test';
 
-// Level 10 ("sub-him-out"), per js/levels.js:
-//   editableTargets: [{ kind: 'item', index: 0 }]
-//   solution: { items: { 0: { order: 1 } } }
-// Level 11 ("one-man-down-low"):
+// Level 9 ("sixth-man"), per js/levels.js:
 //   editableTargets: [{ kind: 'item', index: 1 }]
-//   solution: { items: { 1: { alignSelf: 'flex-end' } } }
+//   solution: { items: { 1: { alignSelf: 'flex-start' } } }
+// Level 13 ("clutch-substitution"):
+//   editableTargets: [{ kind: 'item', index: 3 }]
+//   solution: { items: { 3: { order: -2 } } }
 const CASES = [
   {
-    levelNumber: 10,
-    declaration: 'order: 1;',
-    ballNth: 0,
-    styleProp: 'order',
-  },
-  {
-    levelNumber: 11,
-    declaration: 'align-self: flex-end;',
+    levelNumber: 9,
+    declaration: 'align-self: flex-start;',
     ballNth: 1,
     styleProp: 'alignSelf',
+  },
+  {
+    levelNumber: 13,
+    declaration: 'order: -2;',
+    ballNth: 3,
+    styleProp: 'order',
   },
 ];
 
@@ -30,7 +30,7 @@ for (const { levelNumber, declaration, ballNth, styleProp } of CASES) {
   test(`level ${levelNumber}: Reset clears the item-level inline style before checking`, async ({ page }) => {
     // First pass: solve the level for real, to confirm the declaration is correct.
     await page.locator('#level-nav .level-chip').nth(levelNumber - 1).click();
-    await expect(page.locator('#level-indicator')).toHaveText(`Level ${levelNumber} of 12`);
+    await expect(page.locator('#level-indicator')).toHaveText(`Level ${levelNumber} of 14`);
 
     let textarea = page.locator('#editor-blocks textarea').first();
     await textarea.fill(declaration);
@@ -41,7 +41,7 @@ for (const { levelNumber, declaration, ballNth, styleProp } of CASES) {
     // (clearing any DOM/module state) and re-navigate to the same level.
     await page.reload();
     await page.locator('#level-nav .level-chip').nth(levelNumber - 1).click();
-    await expect(page.locator('#level-indicator')).toHaveText(`Level ${levelNumber} of 12`);
+    await expect(page.locator('#level-indicator')).toHaveText(`Level ${levelNumber} of 14`);
 
     // Confirm this instance is unsolved/blank before we touch it.
     textarea = page.locator('#editor-blocks textarea').first();

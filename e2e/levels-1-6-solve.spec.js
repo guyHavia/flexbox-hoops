@@ -2,64 +2,68 @@ import { test, expect } from '@playwright/test';
 
 // Levels 1-6 (indices 0-5), per js/levels.js. All six are single-textarea
 // "container" levels (editableTargets: [{ kind: 'container' }]) driven by
-// justify-content / align-items. Solution text below is hand-derived from
-// each level's `solution.container` object, converted to kebab-case CSS
-// exactly as js/parser.js expects (camelCase <- kebab-case, ";"/newline
-// separated declarations).
+// justify-content / align-items / flex-direction. Solution text below is
+// hand-derived from each level's `base` + `solution.container` object,
+// converted to kebab-case CSS exactly as js/parser.js expects (camelCase <-
+// kebab-case, ";"/newline separated declarations).
 const LEVELS_1_6 = [
   {
     index: 0,
-    id: 'baseline-drive',
-    title: 'Baseline Drive',
-    // solution: { container: { justifyContent: 'flex-end' } }
-    solutionText: 'justify-content: flex-end;',
-    // Single ball, basket on the right edge -> flex-start sends the ball
-    // to the opposite (left) edge, clearly unaligned.
-    wrongText: 'justify-content: flex-start;',
+    id: 'opening-tip',
+    title: 'Opening Tip',
+    ballCount: 1,
+    // base: { justifyContent: 'flex-end' }
+    // solution: { container: { justifyContent: 'flex-start' } }
+    solutionText: 'justify-content: flex-start;',
+    // Single ball, basket on the left edge -> flex-end leaves the ball at
+    // its starting (right) edge, clearly unaligned.
+    wrongText: 'justify-content: flex-end;',
   },
   {
     index: 1,
-    id: 'top-of-the-key',
-    title: 'Top of the Key',
-    // solution: { container: { justifyContent: 'center' } }
-    solutionText: 'justify-content: center;',
+    id: 'pick-and-roll',
+    title: 'Pick and Roll',
+    ballCount: 2,
+    // solution: { container: { flexDirection: 'row-reverse' } }
+    solutionText: 'flex-direction: row-reverse;',
   },
   {
     index: 2,
-    id: 'spread-the-floor',
-    title: 'Spread the Floor',
-    // solution: { container: { justifyContent: 'space-between' } }
-    solutionText: 'justify-content: space-between;',
+    id: 'free-throw-lane',
+    title: 'Free Throw Lane',
+    ballCount: 1,
+    // solution: { container: { alignItems: 'center' } }
+    solutionText: 'align-items: center;',
+    // Single ball, basket at the vertical midline -> flex-end sends the
+    // ball to the opposite (bottom) edge, clearly unaligned.
+    wrongText: 'align-items: flex-end;',
   },
   {
     index: 3,
-    id: 'even-spacing',
-    title: 'Even Spacing',
-    // solution: { container: { justifyContent: 'space-around' } }
-    solutionText: 'justify-content: space-around;',
+    id: 'corner-three',
+    title: 'Corner Three',
+    ballCount: 3,
+    // solution: { container: { justifyContent: 'space-between', alignItems: 'flex-end' } }
+    solutionText: 'justify-content: space-between;\nalign-items: flex-end;',
   },
   {
     index: 4,
-    id: 'low-post',
-    title: 'Low Post',
-    // solution: { container: { alignItems: 'flex-end' } }
-    solutionText: 'align-items: flex-end;',
-    // Single ball, basket dropped to the bottom -> flex-start sends the
-    // ball to the opposite (top) edge, clearly unaligned.
-    wrongText: 'align-items: flex-start;',
+    id: 'zone-defense',
+    title: 'Zone Defense',
+    ballCount: 3,
+    // solution: { container: { flexDirection: 'column' } }
+    solutionText: 'flex-direction: column;',
   },
   {
     index: 5,
-    id: 'center-court',
-    title: 'Center Court',
-    // solution: { container: { justifyContent: 'center', alignItems: 'center' } }
-    solutionText: 'justify-content: center;\nalign-items: center;',
-    // Deliberately partial: only the main-axis declaration. The ball's
-    // .ball rule gives it a fixed 52px height, so with no align-items set
-    // the default (stretch) behaves like flex-start on the cross axis --
-    // the ball ends up centered horizontally but pinned to the top, while
-    // the basket sits dead center. Cross-axis mismatch should fail.
-    wrongText: 'justify-content: center;',
+    id: 'transition-offense',
+    title: 'Transition Offense',
+    ballCount: 3,
+    // base: { flexDirection: 'column' }
+    // solution: { container: { flexDirection: 'column', justifyContent: 'space-around' } }
+    solutionText: 'flex-direction: column;\njustify-content: space-around;',
+    // Only the (redundant) direction declaration, no spacing -> still wrong.
+    wrongText: 'flex-direction: column;',
   },
 ];
 
@@ -101,7 +105,7 @@ for (const level of LEVELS_1_6) {
       await page.addInitScript(() => localStorage.clear());
       await page.goto('/');
       await page.locator('#level-nav .level-chip').nth(level.index).click();
-      await expect(page.locator('#level-indicator')).toHaveText(`Level ${level.index + 1} of 12`);
+      await expect(page.locator('#level-indicator')).toHaveText(`Level ${level.index + 1} of 14`);
     });
 
     test('solves with the documented correct solution', async ({ page }) => {
@@ -156,10 +160,10 @@ test.describe('Levels 1-6 solved in sequence via Next Level', () => {
 
     await page.addInitScript(() => localStorage.clear());
     await page.goto('/');
-    await expect(page.locator('#level-indicator')).toHaveText('Level 1 of 12');
+    await expect(page.locator('#level-indicator')).toHaveText('Level 1 of 14');
 
     for (const level of LEVELS_1_6) {
-      await expect(page.locator('#level-indicator')).toHaveText(`Level ${level.index + 1} of 12`);
+      await expect(page.locator('#level-indicator')).toHaveText(`Level ${level.index + 1} of 14`);
 
       const textarea = page.locator('#editor-blocks textarea').first();
       await textarea.fill(level.solutionText);
@@ -173,7 +177,7 @@ test.describe('Levels 1-6 solved in sequence via Next Level', () => {
       // measure ball vs. basket centers ourselves and compare against the
       // documented 6px tolerance from js/geometry.js.
       const pairs = await getBallBasketRectPairs(page);
-      expect(pairs.length).toBe(level.index === 2 || level.index === 3 ? 3 : 1);
+      expect(pairs.length).toBe(level.ballCount);
       for (const { ball, basket } of pairs) {
         expect(
           centersAligned(ball, basket, 6),

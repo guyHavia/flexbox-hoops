@@ -1,14 +1,15 @@
 import { test, expect } from '@playwright/test';
 
-// Level 1 ("baseline-drive"), per js/levels.js:
+// Level 1 ("opening-tip"), per js/levels.js:
 //   editableTargets: [{ kind: 'container' }]
-//   solution: { container: { justifyContent: 'flex-end' } }
-const LEVEL_1_SOLUTION = 'justify-content: flex-end;';
+//   base: { justifyContent: 'flex-end' }
+//   solution: { container: { justifyContent: 'flex-start' } }
+const LEVEL_1_SOLUTION = 'justify-content: flex-start;';
 
-// Level 6 ("center-court"), per js/levels.js:
+// Level 4 ("corner-three"), per js/levels.js:
 //   editableTargets: [{ kind: 'container' }]
-//   solution: { container: { justifyContent: 'center', alignItems: 'center' } }
-const LEVEL_6_INDEX = 5; // zero-based nav index
+//   solution: { container: { justifyContent: 'space-between', alignItems: 'flex-end' } }
+const LEVEL_4_INDEX = 3; // zero-based nav index
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => localStorage.clear());
@@ -28,10 +29,12 @@ test('typing the correct declaration re-renders live, before any Check click', a
   // Confirm the container actually picked up the inline style live.
   await expect
     .poll(() => page.locator('#ball-layer').evaluate((el) => el.style.justifyContent))
-    .toBe('flex-end');
+    .toBe('flex-start');
 
+  // The ball starts at the right edge (base: justify-content: flex-end) and
+  // the solution moves it to the left edge, so its x position should drop.
   const afterBox = await ball.boundingBox();
-  expect(afterBox.x).toBeGreaterThan(beforeBox.x);
+  expect(afterBox.x).toBeLessThan(beforeBox.x);
 
   // None of this required clicking Check.
   await expect(page.locator('#success-overlay')).toBeHidden();
@@ -39,7 +42,7 @@ test('typing the correct declaration re-renders live, before any Check click', a
 
 test('uppercase kebab-case property name is accepted', async ({ page }) => {
   const textarea = page.locator('#editor-blocks textarea').first();
-  await textarea.fill('JUSTIFY-CONTENT: flex-end;');
+  await textarea.fill('JUSTIFY-CONTENT: flex-start;');
 
   await page.locator('#check-btn').click();
 
@@ -48,7 +51,7 @@ test('uppercase kebab-case property name is accepted', async ({ page }) => {
 
 test('extra blank lines and surrounding whitespace do not break parsing', async ({ page }) => {
   const textarea = page.locator('#editor-blocks textarea').first();
-  const text = '\n\n   \n  justify-content :   flex-end   ;  \n\n   \n';
+  const text = '\n\n   \n  justify-content :   flex-start   ;  \n\n   \n';
   await textarea.fill(text);
 
   await page.locator('#check-btn').click();
@@ -65,7 +68,7 @@ test('unknown property is silently dropped alongside a valid one, no page errors
   });
 
   const textarea = page.locator('#editor-blocks textarea').first();
-  await textarea.fill('foo-bar: baz; justify-content: flex-end;');
+  await textarea.fill('foo-bar: baz; justify-content: flex-start;');
 
   await page.locator('#check-btn').click();
 
@@ -134,9 +137,12 @@ test('Reset clears the textarea, the inline style, and the check-message `hidden
   await page.locator('#reset-btn').click();
 
   await expect(textarea).toHaveValue('');
+  // Reset clears the *user's* override, not the level's own base state —
+  // level 1's base sets justify-content: flex-end, so that's what should
+  // remain once the typed override is gone.
   await expect
     .poll(() => ballLayer.evaluate((el) => el.style.justifyContent))
-    .toBe('');
+    .toBe('flex-end');
 
   // Assert at the DOM-property level (independent of CSS rendering) that
   // handleReset() really does set `checkMessage.hidden = true` (js/game.js:219).
@@ -197,44 +203,44 @@ test('BUG: #check-message stays visually visible after Reset despite hidden=true
   await expect(checkMessage).toBeHidden();
 });
 
-test('level 6 requires BOTH justify-content and align-items; only one is not enough', async ({ page }) => {
-  await page.locator('#level-nav .level-chip').nth(LEVEL_6_INDEX).click();
-  await expect(page.locator('#level-indicator')).toHaveText('Level 6 of 12');
+test('level 4 requires BOTH justify-content and align-items; only one is not enough', async ({ page }) => {
+  await page.locator('#level-nav .level-chip').nth(LEVEL_4_INDEX).click();
+  await expect(page.locator('#level-indicator')).toHaveText('Level 4 of 14');
 
   const textarea = page.locator('#editor-blocks textarea').first();
 
   // Only justify-content: not solved.
-  await textarea.fill('justify-content: center;');
+  await textarea.fill('justify-content: space-between;');
   await page.locator('#check-btn').click();
   await expect(page.locator('#success-overlay')).toBeHidden();
 
   // Only align-items (replacing the previous value): still not solved.
-  await textarea.fill('align-items: center;');
+  await textarea.fill('align-items: flex-end;');
   await page.locator('#check-btn').click();
   await expect(page.locator('#success-overlay')).toBeHidden();
 
   // Both together: solved.
-  await textarea.fill('justify-content: center; align-items: center;');
+  await textarea.fill('justify-content: space-between; align-items: flex-end;');
   await page.locator('#check-btn').click();
   await expect(page.locator('#success-overlay')).toBeVisible();
 });
 
-test('level 6: semicolon-separated one-liner and one-per-line declarations parse identically', async ({ page }) => {
+test('level 4: semicolon-separated one-liner and one-per-line declarations parse identically', async ({ page }) => {
   const textarea = page.locator('#editor-blocks textarea').first();
 
   // One line, semicolon-separated.
-  await page.locator('#level-nav .level-chip').nth(LEVEL_6_INDEX).click();
-  await expect(page.locator('#level-indicator')).toHaveText('Level 6 of 12');
-  await textarea.fill('justify-content: center; align-items: center;');
+  await page.locator('#level-nav .level-chip').nth(LEVEL_4_INDEX).click();
+  await expect(page.locator('#level-indicator')).toHaveText('Level 4 of 14');
+  await textarea.fill('justify-content: space-between; align-items: flex-end;');
   await page.locator('#check-btn').click();
   await expect(page.locator('#success-overlay')).toBeVisible();
 
   // Fresh instance of the same level, declarations split across two lines.
   await page.reload();
-  await page.locator('#level-nav .level-chip').nth(LEVEL_6_INDEX).click();
-  await expect(page.locator('#level-indicator')).toHaveText('Level 6 of 12');
+  await page.locator('#level-nav .level-chip').nth(LEVEL_4_INDEX).click();
+  await expect(page.locator('#level-indicator')).toHaveText('Level 4 of 14');
   const textarea2 = page.locator('#editor-blocks textarea').first();
-  await textarea2.fill('justify-content: center;\nalign-items: center;');
+  await textarea2.fill('justify-content: space-between;\nalign-items: flex-end;');
   await page.locator('#check-btn').click();
   await expect(page.locator('#success-overlay')).toBeVisible();
 });

@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
 
-// Level 1 ("baseline-drive") solution, per js/levels.js:
-//   solution: { container: { justifyContent: 'flex-end' } }
-const LEVEL_1_SOLUTION = 'justify-content: flex-end;';
+// Level 1 ("opening-tip") solution, per js/levels.js:
+//   base: { justifyContent: 'flex-end' }
+//   solution: { container: { justifyContent: 'flex-start' } }
+const LEVEL_1_SOLUTION = 'justify-content: flex-start;';
 
 // The success-overlay scene runs several CSS animations before it settles into
 // its final ("both" fill-mode) resting state: shooter-hop / leg-bend /
@@ -31,7 +32,7 @@ const SHOOTER_AND_HOOP_PARTS = [
 ];
 
 async function solveLevel1(page) {
-  await expect(page.locator('#level-indicator')).toHaveText('Level 1 of 12');
+  await expect(page.locator('#level-indicator')).toHaveText('Level 1 of 14');
   const textarea = page.locator('#editor-blocks textarea').first();
   await textarea.fill(LEVEL_1_SOLUTION);
   await page.locator('#check-btn').click();
@@ -183,7 +184,7 @@ test.describe('narrow mobile viewport (375x667)', () => {
     expect(box.y + box.height).toBeLessThanOrEqual(667);
 
     await btn.click();
-    await expect(page.locator('#level-indicator')).toHaveText('Level 2 of 12');
+    await expect(page.locator('#level-indicator')).toHaveText('Level 2 of 14');
   });
 });
 

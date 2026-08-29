@@ -27,14 +27,16 @@ test('flags a solution item index outside ballCount', () => {
 });
 
 test('flags missing coverage of a required property', () => {
-  const withoutWrap = LEVELS.filter((l) => l.id !== 'full-roster');
+  const flexWrapIds = ['full-court-fastbreak', 'double-team', 'buzzer-beater', 'full-roster'];
+  const withoutWrap = LEVELS.filter((l) => !flexWrapIds.includes(l.id));
   const errors = validateLevels(withoutWrap);
   assert.ok(errors.some((e) => e.includes('flexWrap')));
 });
 
 test('flags fewer than 3 combined-property levels', () => {
-  const combinedIds = ['center-court', 'bottom-up', 'one-man-down-low'];
-  const nonCombined = LEVELS.filter((l) => !combinedIds.includes(l.id)).slice(0, 3);
+  const nonCombinedIds = ['pick-and-roll', 'free-throw-lane', 'zone-defense'];
+  const nonCombined = LEVELS.filter((l) => nonCombinedIds.includes(l.id));
+  assert.equal(nonCombined.length, 3);
   const errors = validateLevels(nonCombined);
   assert.ok(errors.some((e) => e.includes('combining more than one property')));
 });

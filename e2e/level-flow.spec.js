@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
 
-// Level 1 ("baseline-drive") solution, per js/levels.js:
-//   solution: { container: { justifyContent: 'flex-end' } }
-const LEVEL_1_SOLUTION = 'justify-content: flex-end;';
+// Level 1 ("opening-tip") solution, per js/levels.js:
+//   base: { justifyContent: 'flex-end' }
+//   solution: { container: { justifyContent: 'flex-start' } }
+const LEVEL_1_SOLUTION = 'justify-content: flex-start;';
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => localStorage.clear());
@@ -10,10 +11,10 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('smoke: loads, solves level 1, advances, and jumps via level nav', async ({ page }) => {
-  await expect(page.locator('#level-indicator')).toHaveText('Level 1 of 12');
+  await expect(page.locator('#level-indicator')).toHaveText('Level 1 of 14');
 
   const chips = page.locator('#level-nav .level-chip');
-  await expect(chips).toHaveCount(12);
+  await expect(chips).toHaveCount(14);
 
   // Regression check for a real bug found via screenshot: the basket
   // backboard used to render ~11px above the court's own top edge and get
@@ -40,9 +41,9 @@ test('smoke: loads, solves level 1, advances, and jumps via level nav', async ({
 
   // Advance to level 2.
   await page.locator('#next-level-btn').click();
-  await expect(page.locator('#level-indicator')).toHaveText('Level 2 of 12');
+  await expect(page.locator('#level-indicator')).toHaveText('Level 2 of 14');
 
   // Jump to level 5 via the nav chip.
   await chips.nth(4).click();
-  await expect(page.locator('#level-indicator')).toHaveText('Level 5 of 12');
+  await expect(page.locator('#level-indicator')).toHaveText('Level 5 of 14');
 });

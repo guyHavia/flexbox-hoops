@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
 
-// Level 1 ("baseline-drive") solution, per js/levels.js:
-//   solution: { container: { justifyContent: 'flex-end' } }
-const LEVEL_1_SOLUTION = 'justify-content: flex-end;';
+// Level 1 ("opening-tip") solution, per js/levels.js:
+//   base: { justifyContent: 'flex-end' }
+//   solution: { container: { justifyContent: 'flex-start' } }
+const LEVEL_1_SOLUTION = 'justify-content: flex-start;';
 
 test.beforeEach(async ({ page }) => {
   // Clear localStorage once for a clean starting state. Deliberately NOT
@@ -25,5 +26,5 @@ test('solved progress survives a page reload', async ({ page }) => {
   await expect(firstChip).toHaveClass(/level-chip--solved/);
 
   const solvedCounter = page.locator('#solved-counter');
-  await expect(solvedCounter).toHaveText(/^([1-9]\d*) \/ 12 solved$/);
+  await expect(solvedCounter).toHaveText(/^([1-9]\d*) \/ 14 solved$/);
 });

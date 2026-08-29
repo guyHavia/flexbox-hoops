@@ -1,16 +1,16 @@
 import { test, expect } from '@playwright/test';
 
-// Level 12 ("full-roster"), per js/levels.js:
+// Level 14 ("full-roster"), per js/levels.js:
 //   editableTargets: [{ kind: 'container' }]
 //   solution: { container: { flexWrap: 'wrap', alignContent: 'space-between' } }
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => localStorage.clear());
   await page.goto('/');
-  await page.locator('#level-nav .level-chip').nth(11).click();
-  await expect(page.locator('#level-indicator')).toHaveText('Level 12 of 12');
+  await page.locator('#level-nav .level-chip').nth(13).click();
+  await expect(page.locator('#level-indicator')).toHaveText('Level 14 of 14');
 });
 
-test('level 12 requires both flex-wrap and align-content, not just flex-wrap', async ({ page }) => {
+test('level 14 requires both flex-wrap and align-content, not just flex-wrap', async ({ page }) => {
   const textarea = page.locator('#editor-blocks textarea').first();
   const successOverlay = page.locator('#success-overlay');
 

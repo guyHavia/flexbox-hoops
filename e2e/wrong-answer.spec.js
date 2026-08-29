@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
 
-// Level 1 ("baseline-drive") solution, per js/levels.js:
-//   solution: { container: { justifyContent: 'flex-end' } }
-const LEVEL_1_SOLUTION = 'justify-content: flex-end;';
+// Level 1 ("opening-tip") solution, per js/levels.js:
+//   base: { justifyContent: 'flex-end' }
+//   solution: { container: { justifyContent: 'flex-start' } }
+const LEVEL_1_SOLUTION = 'justify-content: flex-start;';
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => localStorage.clear());
