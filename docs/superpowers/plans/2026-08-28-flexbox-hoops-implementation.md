@@ -1339,7 +1339,7 @@ function renderEditor(level) {
     wrapper.className = 'css-block';
     wrapper.innerHTML = `
       <div class="css-block__open">${blockLabel(target)} {</div>
-      <textarea placeholder="${target.kind === 'container' ? '  justify-content: …;' : '  order: …;'}"></textarea>
+      <textarea placeholder="${target.kind === 'container' ? 'property: value;' : '  order: …;'}"></textarea>
       <div class="css-block__close">}</div>
     `;
     const textarea = wrapper.querySelector('textarea');
