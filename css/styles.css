@@ -763,8 +763,55 @@ body {
   color: var(--navy-600);
 }
 
+/* ==========================================================================
+   Responsive Breakpoints
+   ========================================================================== */
+
+/* Tablet & Mobile Layout (<= 760px) */
 @media (max-width: 760px) {
-  .game-main { flex-direction: column; padding: var(--space-4); gap: var(--space-4); }
-  .side-panel { max-width: 100%; }
-  .app-header { padding: var(--space-3) var(--space-4); }
+  .game-main { 
+    flex-direction: column; 
+    padding: var(--space-4); 
+    gap: var(--space-4); 
+  }
+  .side-panel { 
+    width: 100%;
+    max-width: 100%; 
+  }
+  .app-header { 
+    padding: var(--space-3) var(--space-4); 
+  }
+}
+
+/* Small Mobile Adjustments (<= 520px) */
+@media (max-width: 520px) {
+  .app-header {
+    padding: 8px 12px;
+  }
+  
+  .app-title {
+    font-size: 1.25rem;
+  }
+
+  .court-wrapper {
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .court {
+    transform: scale(0.72);
+    transform-origin: top center;
+    margin-bottom: -130px;
+  }
+
+  .game-main {
+    gap: 12px;
+    padding: 8px;
+  }
+
+  .panel-card {
+    padding: 12px;
+  }
 }
