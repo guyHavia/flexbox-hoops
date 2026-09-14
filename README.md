@@ -1,5 +1,7 @@
 # Flexbox Hoops
 
+**Submitted by:** Guy Havia & Ori Peretz
+
 A 14-level basketball-themed game for learning CSS Flexbox. Arrange balls
 on the court by editing real CSS declarations — when your flex properties
 match the level's target, the balls land in the baskets. Inspired by the

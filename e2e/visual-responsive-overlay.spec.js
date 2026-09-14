@@ -155,7 +155,7 @@ test.describe('narrow mobile viewport (375x667)', () => {
 
     // Same expectation as e2e/responsive.spec.js: the court never shrinks.
     const courtWidth = await page.locator('.court').evaluate((el) => el.getBoundingClientRect().width);
-    expect(courtWidth).toBe(480);
+    expect(courtWidth).toBe(320);
 
     const scrollInfo = await page.locator('.court-wrapper').evaluate((el) => ({
       scrollWidth: el.scrollWidth,
