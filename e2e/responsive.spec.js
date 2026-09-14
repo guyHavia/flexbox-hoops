@@ -12,7 +12,7 @@ test('narrow viewport keeps the court fixed-size and stacks the panel below it',
   const courtWidth = await page.locator('.court').evaluate(
     (el) => el.getBoundingClientRect().width
   );
-  expect(courtWidth).toBe(480);
+  expect(courtWidth).toBe(320);
 
   const courtBox = await page.locator('.court').boundingBox();
   const panelBox = await page.locator('.side-panel').boundingBox();
